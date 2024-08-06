@@ -1,0 +1,39 @@
+{
+  "fixtures": [
+    {
+      "name": "customer_moe",
+      "path": "/v1/customers",
+      "method": "post",
+      "params": {
+        "test_clock": "${.env:STRIPE_TEST_CLOCK}",
+        "name": "Moe Kahn",
+        "email": "moe.fixtures@example.com"
+      }
+    },
+    {
+      "name": "payment_method_moe",
+      "path": "/v1/payment_methods/pm_card_visa_debit/attach",
+      "method": "post",
+      "params": {
+        "customer": "${customer_moe:id}"
+      }
+    },
+    {
+      "name": "subscription_moe_crossclip",
+      "path": "/v1/subscriptions",
+      "method": "post",
+      "params": {
+        "customer": "${customer_moe:id}",
+        "items": [
+          {
+            "price": "price_1Pkd66G7uyebomuyZ0nBSt5b"
+          }
+        ],
+        "default_payment_method": "${payment_method_moe:id}",
+        "coupon": "5fcMPEn3",
+        "currency": "gbp",
+        "trial_period_days": 30
+      }
+    }
+  ]
+}
