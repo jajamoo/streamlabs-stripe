@@ -148,18 +148,7 @@ class StripeService
         foreach ($subscription->items->data as $item) {
             if ($item['price']['lookup_key'] == 'monthly_crossclip_basic') {
                 $subscriptionItemId               = $item['id'];
-                $currentSimulatedSubscriptionDate = new DateTime("@$subscription->current_period_start");
-                $currentSimulatedSubscriptionDay  = $currentSimulatedSubscriptionDate->format('d');
-
-                //If we're past the 15th, start subscription billing the first day of the next month
-                if ($currentSimulatedSubscriptionDay > 15) {
-                    $nextBillingDate = $currentSimulatedSubscriptionDate->modify('first day of next month')->setDate($currentSimulatedSubscriptionDate->format('Y'), $currentSimulatedSubscriptionDate->format('m'), 15);
-                }
-                else {
-                    $nextBillingDate = $currentSimulatedSubscriptionDate->setDate($currentSimulatedSubscriptionDate->format('Y'), $currentSimulatedSubscriptionDate->format('m'), 15);
-                }
-                $billingCycleAnchor = $nextBillingDate->getTimestamp();
-
+                $billingCycleAnchor = $this->calculateBillingDay($subscription->current_period_start);
                 try {
                     // Update the subscription with the new prorated upgrade
                     $updatedSubscription = $this->stripeClient->subscriptions->update($subscription->id, [
@@ -185,7 +174,25 @@ class StripeService
         }
         return false;
     }
-    
+
+    /**
+     * @param int $subscriptionCurrentPeriodStart
+     * @return int
+     */
+    private function calculateBillingDay(int $subscriptionCurrentPeriodStart)
+    {
+        $currentSimulatedSubscriptionDate = new DateTime("@$subscriptionCurrentPeriodStart");
+        $currentSimulatedSubscriptionDay  = $currentSimulatedSubscriptionDate->format('d');
+
+        //If we're past the 15th, start subscription billing the first day of the next month
+        if ($currentSimulatedSubscriptionDay > 15) {
+            $nextBillingDate = $currentSimulatedSubscriptionDate->modify('first day of next month')->setDate($currentSimulatedSubscriptionDate->format('Y'), $currentSimulatedSubscriptionDate->format('m'), 15);
+        }
+        else {
+            $nextBillingDate = $currentSimulatedSubscriptionDate->setDate($currentSimulatedSubscriptionDate->format('Y'), $currentSimulatedSubscriptionDate->format('m'), 15);
+        }
+        return $nextBillingDate->getTimestamp();
+    }
 
     /**
      * @return array|\Stripe\Price[]|\Stripe\StripeObject[]
