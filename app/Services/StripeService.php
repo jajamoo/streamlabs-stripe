@@ -163,7 +163,7 @@ class StripeService
                 try {
                     // Update the subscription with the new prorated upgrade
                     $updatedSubscription = $this->stripeClient->subscriptions->update($subscription->id, [
-                        'billing_cycle_anchor' => 'now',
+                        'billing_cycle_anchor' => 'unchanged',
                         'proration_behavior'   => 'create_prorations',
                         'items'                => [
                             [
@@ -178,6 +178,9 @@ class StripeService
                     Log::error($exception->getMessage());
                     return false;
                 }
+            } else {
+                Log::info("Subscription with ID $subscription->id not prorated - it's already a premium subscription");
+                return false;
             }
         }
         return false;

@@ -61,7 +61,7 @@ class StripeController extends Controller
     {
         $subscriptionId = $request->input('subscription_id');
         $skipCheck = $request->input('skip_month_check');
-        //sub_1PkwK7G7uyebomuyQQ7hTP2c
+        
         if($stripeService->checkSubscriptionAndProrate($subscriptionId, $skipCheck)
         //false param here will enforce the 5th month check
         ) {
@@ -70,7 +70,7 @@ class StripeController extends Controller
             ]);
         }
         return response()->json([
-            'success' => true
+            'success' => false
         ]);
     }
     
