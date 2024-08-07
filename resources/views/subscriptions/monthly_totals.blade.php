@@ -26,7 +26,7 @@
         <tr>
             <td>Customer Emails</td>
             @foreach($data as $monthData)
-                <td>{{ $monthData['emails'] }}</td>
+                <td>{{ $monthData['emails'][0] }}</td>
             @endforeach
         </tr>
         </tbody>
