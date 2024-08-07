@@ -98,7 +98,7 @@ class StripeService
      * @return bool
      * @throws \Stripe\Exception\ApiErrorException
      */
-    public function checkSubscriptionAndProrate(string $subscriptionId)
+    public function checkSubscriptionAndProrate(string $subscriptionId, bool $skipFiveMonths = true)
     {
         try {
             $subscription = $this->stripeClient->subscriptions->retrieve($subscriptionId);
@@ -110,8 +110,9 @@ class StripeService
         //After running the simulation into January, we're now 5 months in
         $currentMonth = $this->getCurrentSubscriptionMonth($subscription->current_period_start);
 
-        if ($currentMonth == 5) {
-            echo "This is the 5th month of the subscription. Performing proration.\n";
+        if ($skipFiveMonths || (!$skipFiveMonths && $currentMonth == 5)) {
+            $logMessage = (!$skipFiveMonths && $currentMonth == 5) ? "Fifth month contraint honored - this is the 5th month of the subscription. Performing proration.\n" : "Five month check skipped, prorating subscription now.\n";
+            Log::info($logMessage);
             return $this->prorateSubscription($subscription);
         } else{
             Log::info("Subscription with ID $subscription->id could not be prorated - 5 months has not passed");
