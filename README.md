@@ -1,13 +1,8 @@
 <p align="center"><a href="https://laravel.com" target="_blank"><img src="https://cdn.streamlabs.com/static/imgs/identity/streamlabs-logo-thumb.png" alt="Streamlabs Kevin"></a></p>
 
-
 # Streamlabs Senior Payments Assignment
-
-
-
-
 ## Setup and Notes
-- (Optional) Laravel Sail can be used for this project. You can find the documentation [here](https://laravel.com/docs/11.x/sail)
+- I used Laravel Sail to get this project up and Running. You can find the documentation [here](https://laravel.com/docs/11.x/sail)
   - copy .env.example to .env
   - NB: in the /docker/Dockerfile, change the arm deb files to amd or the installation will fail.
     - `RUN curl -L -o /tmp/stripe_1.21.2_linux_amd64.deb https://github.com/stripe/stripe-cli/releases/download/v1.21.2/stripe_1.21.2_linux_amd64.deb \
@@ -48,3 +43,8 @@ A few things to note as we look at this code:
     - A better approach would have been to set the proration on the subscription to fire off at some point in the future: so when it hits the 5 month mark, it automatically prorates
       I did not find a way to do that but would love to discuss with the team an approach to do it, if possible
     
+## The Proof is in the Pudding (or in this case, screenshots)!
+  - [Customer Created](https://i.imgur.com/kb8wuei.png)
+  - [Programatic creation of the Customer and Subscription](https://i.imgur.com/RN4AgiU.png)
+  - [Proration Upgrade on the 5th month](https://i.imgur.com/KRPfqGg.png)
+  - [Output of Table data]()
