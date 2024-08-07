@@ -66,6 +66,8 @@ class CreateStripeCustomersAndSubscriptionsCommand extends Command implements Pr
                                 'default_payment_method' => $retrievedPaymentMethod->id,
                                 'trial_period_days' => 30
                             ]);
+                            $this->info("Subscription with id $subscription->id created for $customer->id for the item with $price->id");
+
                         } catch (\Exception $exception) {
                             dd($exception->getTrace());
                         }
@@ -74,7 +76,6 @@ class CreateStripeCustomersAndSubscriptionsCommand extends Command implements Pr
                 }
             }
         }
-        return response()->json($subscription);
     }
 
     protected function promptForMissingArgumentsUsing(): array
