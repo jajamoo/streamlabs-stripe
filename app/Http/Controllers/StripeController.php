@@ -69,7 +69,7 @@ class StripeController extends Controller
      */
     public function getTotals(StripeService $stripeService)
     {
-        $subscriptionData = $stripeService->calculateSubscriptionChargesByCustomer('sub_1PkwK7G7uyebomuyQQ7hTP2c');
+        $subscriptionData = $stripeService->calculateSubscriptionChargesByCustomer();
         
         return view('subscriptions.monthly_totals', [
             'customerInvoices' => $subscriptionData['customer_invoices'],

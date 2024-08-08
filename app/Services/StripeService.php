@@ -182,7 +182,7 @@ class StripeService
      * @param $subscriptionId
      * @return array
      */
-    public function calculateSubscriptionChargesByCustomer($subscriptionId)
+    public function calculateSubscriptionChargesByCustomer()
     {
         $subscriptions = [
             'sub_1PkwK7G7uyebomuyQQ7hTP2c',
@@ -206,7 +206,7 @@ class StripeService
 
             $invoices = $this->getAllInvoices($subscription->id);
 
-            // Collect start of month dates for the next 12 months
+            // Collect start of month dates for the last and next 12 months
             $months = [];
             for ($i = 11; $i >= 0; $i--) {
                 $months[] = Carbon::now()->subMonths($i)->startOfMonth()->format('Y-m');
