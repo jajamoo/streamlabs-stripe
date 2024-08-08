@@ -11,9 +11,11 @@
             width: 100%;
             border-collapse: collapse;
         }
+
         table, th, td {
             border: 1px solid black;
         }
+
         th, td {
             padding: 8px;
             text-align: left;
@@ -34,14 +36,16 @@
     </tr>
     </thead>
     <tbody>
-    <tr>
-        <td>{{ $customerEmail }}</td>
-        <td>{{ $productName }}</td>
-        @foreach ($nextMonths as $month)
-            <td>${{ number_format($chargeData[$month] ?? 0, 2) }}</td>
-        @endforeach
-        <td>${{ number_format($totalAmount, 2) }}</td>
-    </tr>
+    @foreach ($customerInvoices as $invoice)
+        <tr>
+            <td>{{ $invoice['email'] }}</td>
+            <td>{{ $invoice['product'] }}</td>
+            @foreach ($nextMonths as $month)
+                <td>${{ number_format($invoice['charges'][$month] ?? 0, 2) }}</td>
+            @endforeach
+            <td>${{ number_format($invoice['total'], 2) }}</td>
+        </tr>
+    @endforeach
     </tbody>
 </table>
 </body>

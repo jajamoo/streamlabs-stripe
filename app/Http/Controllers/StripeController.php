@@ -72,10 +72,7 @@ class StripeController extends Controller
         $subscriptionData = $stripeService->calculateSubscriptionChargesByCustomer('sub_1PkwK7G7uyebomuyQQ7hTP2c');
         
         return view('subscriptions.monthly_totals', [
-            'customerEmail' => $subscriptionData['customer_email'],
-            'productName' => $subscriptionData['product_name'],
-            'chargeData' => $subscriptionData['charge_data'],
-            'totalAmount' => $subscriptionData['total_amount'],
+            'customerInvoices' => $subscriptionData['customer_invoices'],
             'nextMonths' => $subscriptionData['next_months']
         ]);
     }

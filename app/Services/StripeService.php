@@ -184,40 +184,63 @@ class StripeService
      */
     public function calculateSubscriptionChargesByCustomer($subscriptionId)
     {
-        $subscription     = $this->getSubscriptionById($subscriptionId);
-        $customer         = $this->getCustomerById($subscription->customer);
-        $subscriptionItem = $subscription->items->data[0]; // Assuming one item per subscription
-        $product          = $this->getProductById($subscriptionItem->price->product);
-        $productName      = $product->name;
+        $subscriptions = [
+            'sub_1PkwK7G7uyebomuyQQ7hTP2c',
+            'sub_1Pkd6IG7uyebomuyIByFqLGK',
+            'sub_1Pkd68G7uyebomuyhksPelXM'
+        ];
 
-        $invoices = $this->getAllInvoices($subscription->id);
+        $customerInvoices = [];
 
-        // Collect start of month dates for the next 12 months
-        $nextMonths = [];
-        for ($i = 0; $i < 12; $i++) {
-            $nextMonths[] = Carbon::now()->addMonths($i)->startOfMonth()->format('Y-m');
+        foreach ($subscriptions as $subscriptionId) {
+            $subscription     = $this->getSubscriptionById($subscriptionId);
+
+            if (!$subscription) {
+                continue; // Skip if the subscription is not found
+            }
+
+            $customer         = $this->getCustomerById($subscription->customer);
+            $subscriptionItem = $subscription->items->data[0]; // Assuming one item per subscription
+            $product          = $this->getProductById($subscriptionItem->price->product);
+            $productName      = $product->name;
+
+            $invoices = $this->getAllInvoices($subscription->id);
+
+            // Collect start of month dates for the next 12 months
+            $months = [];
+            for ($i = 11; $i >= 0; $i--) {
+                $months[] = Carbon::now()->subMonths($i)->startOfMonth()->format('Y-m');
+            }
+            for ($i = 1; $i <= 12; $i++) {
+                $months[] = Carbon::now()->addMonths($i)->startOfMonth()->format('Y-m');
+            }
+            
+            $chargeData  = [];
+            $totalAmount = 0;
+
+            // Initialize charge data for each month
+            foreach ($months as $month) {
+                $chargeData[$month] = 0;
+            }
+
+            foreach ($invoices as $invoice) {
+                $invoiceMonth              = Carbon::createFromTimestamp($invoice->created)->format('Y-m');
+                $chargeData[$invoiceMonth] += $invoice->total / 100; // Convert amount to dollars
+                $totalAmount               += $invoice->total / 100; // Convert amount to dollars
+
+            }
+
+            $customerInvoices[] = [
+                'email' => $customer->email,
+                'product' => $productName,
+                'charges' => $chargeData,
+                'total' => $totalAmount
+            ];
         }
-        $chargeData  = [];
-        $totalAmount = 0;
-
-        // Initialize charge data for each month
-        foreach ($nextMonths as $endOfMonth) {
-            $chargeData[$endOfMonth] = 0;
-        }
-
-        foreach ($invoices as $invoice) {
-            $invoiceMonth              = Carbon::createFromTimestamp($invoice->created)->format('Y-m');
-            $chargeData[$invoiceMonth] += $invoice->total / 100; // Convert amount to dollars
-            $totalAmount               += $invoice->total / 100; // Convert amount to dollars
-
-        }
-
+        
         return [
-            'customer_email' => $customer->email,
-            'product_name'   => $productName,
-            'charge_data'    => $chargeData,
-            'total_amount'   => $totalAmount,
-            'next_months'    => $nextMonths,
+            'customer_invoices' => $customerInvoices,
+            'next_months' => $months
         ];
     }
 
