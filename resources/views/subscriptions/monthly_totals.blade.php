@@ -30,7 +30,7 @@
         @foreach ($nextMonths as $month)
             <th>{{ $month }}</th>
         @endforeach
-        <th>Total</th>
+        <th>Lifetime Time Value</th>
     </tr>
     </thead>
     <tbody>

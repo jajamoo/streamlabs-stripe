@@ -24,7 +24,9 @@
       - `localhost/api/check` : json parameters `{'subscription_id': 'sub_xxxxx', 'skip_month_check':'true_or_false'}`
         - Checks to see if 5 months have passed in the current subscription, and if it has, do a prorated upgrade to the premium. If you want to skip the 5 month check, pass in true for the skip_month_check in the JSON request, otherwise pass in a 'false' boolean for skip_month_check to actually check for the 5 months
         - If successful, you'll get a `{"success": true}`
-        - Go to the Dashboard and confirm your newly prorated subscription :) 
+        - Go to the Dashboard and confirm your newly prorated subscription :)
+    - To see the output of the table for that subscription, grab that subscription ID string and put into the `calculateSubscriptionChargesByCustomer()` function as a parameter
+      - Go to `localhost/totals`
 
 
 >  * Note: I know I could have used the advance test clock API endpoints outlined here: https://docs.stripe.com/api/test_clocks/advance \
@@ -42,9 +44,10 @@ A few things to note as we look at this code:
     (an improvement that could have been done programatically, as I brought up in the point above) and then prorate
     - A better approach would have been to set the proration on the subscription to fire off at some point in the future: so when it hits the 5 month mark, it automatically prorates
       I did not find a way to do that but would love to discuss with the team an approach to do it, if possible
+  - My totals page is for a single subscription. If I had some more time, I would collate the data for ALL subscriptions by just hitting the page and it getting the data, instead of having to pass in a string to the function called in the controller
     
 ## The Proof is in the Pudding (or in this case, screenshots)!
   - [Customer Created](https://i.imgur.com/kb8wuei.png)
   - [Programatic creation of the Customer and Subscription](https://i.imgur.com/RN4AgiU.png)
   - [Proration Upgrade on the 5th month](https://i.imgur.com/KRPfqGg.png)
-  - [Output of Table data]()
+  - [Output of Table data](https://i.imgur.com/WmX6ypA.png)
