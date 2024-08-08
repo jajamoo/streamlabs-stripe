@@ -4,19 +4,18 @@ namespace App\Http\Controllers;
 
 use App\Services\StripeService;
 use DateTime;
-use Illuminate\Console\Concerns\InteractsWithIO;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
-use Illuminate\Support\Facades\Log;
-use Stripe\Invoice;
-use Stripe\Stripe;
-use Stripe\Customer;
 use Stripe\StripeClient;
-use Stripe\Subscription;
 
 class StripeController extends Controller
 {
-    use InteractsWithIO;
+    /**
+     * @param Request $request
+     * @param StripeService $stripeService
+     * @return \Illuminate\Http\JsonResponse
+     * @throws \Stripe\Exception\ApiErrorException
+     */
     public function createSubscription(Request $request, StripeService $stripeService)
     {
         $customerInfo = $stripeService->createCustomerAndAttachPaymentMethod($request->input('email'), $request->input('name'));
@@ -38,17 +37,6 @@ class StripeController extends Controller
                 'error' => 'Unable to create customer and attach payment method'
             ], 500);
         }
-    }
-
-    public function upgradeSubscription(Request $request)
-    {
-        return true;
-//        $stripeClient = new StripeClient(env('STRIPE_SECRET'));
-//        $results      = $stripeClient->customers->all(['limit' => 10000])->data;
-//        foreach ($results as $customer) {
-//            if ($customer->email == 'moe.fixtures@example.com') {
-//            }
-//        }
     }
     
     /**
@@ -73,12 +61,14 @@ class StripeController extends Controller
             'success' => false
         ]);
     }
-    
+
+    /**
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\Contracts\View\View|\Illuminate\Foundation\Application
+     * @throws \Stripe\Exception\ApiErrorException
+     */
     public function getTotals()
     {
         $monthlyData = [];
-
-        Stripe::setApiKey(getenv('STRIPE_SECRET'));
 
         $stripeClient = new StripeClient(env('STRIPE_SECRET'));
 
@@ -109,9 +99,7 @@ class StripeController extends Controller
                 'emails' => $monthData['email']
             ];
         }, $monthlyData);
-
-//        dd($data);
+        
         return view('subscriptions.monthly_totals', compact('headers', 'data'));
-
     }
 }

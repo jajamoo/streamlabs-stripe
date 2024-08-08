@@ -10,5 +10,4 @@ Route::get('/user', function (Request $request) {
 
 
 Route::post('/subscribe', [StripeController::class, 'createSubscription']);
-Route::post('/upgrade', [StripeController::class, 'upgradeSubscription']);
 Route::post('/check', [StripeController::class, 'checkProration']);
