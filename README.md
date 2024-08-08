@@ -25,7 +25,7 @@
         - Checks to see if 5 months have passed in the current subscription, and if it has, do a prorated upgrade to the premium. If you want to skip the 5 month check, pass in true for the skip_month_check in the JSON request, otherwise pass in a 'false' boolean for skip_month_check to actually check for the 5 months
         - If successful, you'll get a `{"success": true}`
         - Go to the Dashboard and confirm your newly prorated subscription :)
-    - To see the output of the table for that subscription, grab that subscription ID string and put into the `calculateSubscriptionChargesByCustomer()` function as a parameter
+    - To see the output of the table for any number of subscriptions, grab the subscription IDs that you want data for (I went to the Dashboard and grabbed 3) and put those strings into the `$subscriptions` array inside `calculateSubscriptionChargesByCustomer()` function in the `StripeService`
       - Go to `localhost/totals`
 
 
