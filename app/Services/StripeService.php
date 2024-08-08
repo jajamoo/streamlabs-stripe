@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use DateTime;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Log;
 use Stripe\Customer;
 use Stripe\PaymentMethod;
@@ -13,7 +14,7 @@ class StripeService
 {
 
     private $stripeClient;
-    
+
     public function __construct()
     {
         $this->stripeClient = new StripeClient(env('STRIPE_SECRET'));
@@ -28,7 +29,7 @@ class StripeService
     public function createCustomerAndAttachPaymentMethod(string $email, string $name)
     {
         try {
-            $customer = $this->stripeClient->customers->create(
+            $customer      = $this->stripeClient->customers->create(
                 [
                     'email'      => $email,
                     'name'       => $name,
@@ -40,7 +41,7 @@ class StripeService
                 ->attach('pm_card_visa', ['customer' => $customer->id]);
             Log::info("Customer with ID $customer->id with Payment Method ID $paymentMethod->id created in Stripe");
             return [
-                'customer' => $customer,
+                'customer'       => $customer,
                 'payment_method' => $paymentMethod,
             ];
         } catch (\Exception $e) {
@@ -90,7 +91,7 @@ class StripeService
                 }
             }
         }
-        return  false;
+        return false;
     }
 
     /**
@@ -114,7 +115,8 @@ class StripeService
             $logMessage = (!$skipFiveMonths && $currentMonth == 5) ? "Fifth month contraint honored - this is the 5th month of the subscription. Performing proration.\n" : "Five month check skipped, prorating subscription now.\n";
             Log::info($logMessage);
             return $this->prorateSubscription($subscription);
-        } else{
+        }
+        else {
             Log::info("Subscription with ID $subscription->id could not be prorated - 5 months has not passed");
             return false;
         }
@@ -147,7 +149,7 @@ class StripeService
         }
         foreach ($subscription->items->data as $item) {
             if ($item['price']['lookup_key'] == 'monthly_crossclip_basic') {
-                $subscriptionItemId               = $item['id'];
+                $subscriptionItemId = $item['id'];
                 $billingCycleAnchor = $this->calculateBillingDay($subscription->current_period_start);
                 try {
                     // Update the subscription with the new prorated upgrade
@@ -167,12 +169,56 @@ class StripeService
                     Log::error($exception->getMessage());
                     return false;
                 }
-            } else {
+            }
+            else {
                 Log::info("Subscription with ID $subscription->id not prorated - it's already a premium subscription");
                 return false;
             }
         }
         return false;
+    }
+
+    /**
+     * @param $subscriptionId
+     * @return array
+     */
+    public function calculateSubscriptionChargesByCustomer($subscriptionId)
+    {
+        $subscription     = $this->getSubscriptionById($subscriptionId);
+        $customer         = $this->getCustomerById($subscription->customer);
+        $subscriptionItem = $subscription->items->data[0]; // Assuming one item per subscription
+        $product          = $this->getProductById($subscriptionItem->price->product);
+        $productName      = $product->name;
+
+        $invoices = $this->getAllInvoices($subscription->id);
+
+        // Collect start of month dates for the next 12 months
+        $nextMonths = [];
+        for ($i = 0; $i < 12; $i++) {
+            $nextMonths[] = Carbon::now()->addMonths($i)->startOfMonth()->format('Y-m');
+        }
+        $chargeData  = [];
+        $totalAmount = 0;
+
+        // Initialize charge data for each month
+        foreach ($nextMonths as $endOfMonth) {
+            $chargeData[$endOfMonth] = 0;
+        }
+
+        foreach ($invoices as $invoice) {
+            $invoiceMonth              = Carbon::createFromTimestamp($invoice->created)->format('Y-m');
+            $chargeData[$invoiceMonth] += $invoice->total / 100; // Convert amount to dollars
+            $totalAmount               += $invoice->total / 100; // Convert amount to dollars
+
+        }
+
+        return [
+            'customer_email' => $customer->email,
+            'product_name'   => $productName,
+            'charge_data'    => $chargeData,
+            'total_amount'   => $totalAmount,
+            'next_months'    => $nextMonths,
+        ];
     }
 
     /**
@@ -210,6 +256,50 @@ class StripeService
     private function getProducts($limit = 10)
     {
         return $this->stripeClient->products->all(['limit' => $limit])->data;
+    }
+
+    /**
+     * @param $subscriptionId
+     * @param $limit
+     * @return array|\Stripe\Invoice[]|\Stripe\StripeObject[]
+     * @throws \Stripe\Exception\ApiErrorException
+     */
+    private function getAllInvoices($subscriptionId, $limit = 10)
+    {
+        return $this->stripeClient->invoices->all([
+            'limit'        => $limit,
+            'subscription' => $subscriptionId,
+        ])->data;
+    }
+
+    /**
+     * @param $productId
+     * @return \Stripe\Product
+     * @throws \Stripe\Exception\ApiErrorException
+     */
+    private function getProductById($productId)
+    {
+        return $this->stripeClient->products->retrieve($productId);
+    }
+
+    /**
+     * @param $subscriptionId
+     * @return Subscription
+     * @throws \Stripe\Exception\ApiErrorException
+     */
+    private function getSubscriptionById($subscriptionId)
+    {
+        return $this->stripeClient->subscriptions->retrieve($subscriptionId);
+    }
+
+    /**
+     * @param $customerId
+     * @return Customer
+     * @throws \Stripe\Exception\ApiErrorException
+     */
+    private function getCustomerById($customerId)
+    {
+        return $this->stripeClient->customers->retrieve($customerId);
     }
 
     /**
