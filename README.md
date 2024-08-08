@@ -31,7 +31,7 @@
 
 >  * Note: I know I could have used the advance test clock API endpoints outlined here: https://docs.stripe.com/api/test_clocks/advance \
 >   But in the interest of time, I advanced the time via the Stripe Dashboard 
->  * For the prorated upgrade to work, once the initial customer and subscription are set up, go to the Stripe Dashboard, advance the time associated with the customer. Otherwise, pass in the boolean referenced above in the controller via the skip_month_check param in the JSON request
+>  * For the prorated upgrade to work (assuming you are enforcing the 5 month check), once the initial customer and subscription are set up, go to the Stripe Dashboard, advance the time associated with the customer. Otherwise, pass in the boolean referenced above in the controller via the skip_month_check param in the JSON request
 
 ## Documentation & Improvements
 A few things to note as we look at this code:
