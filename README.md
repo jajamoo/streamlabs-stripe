@@ -44,7 +44,7 @@ A few things to note as we look at this code:
     (an improvement that could have been done programatically, as I brought up in the point above) and then prorate
     - A better approach would have been to set the proration on the subscription to fire off at some point in the future: so when it hits the 5 month mark, it automatically prorates
       I did not find a way to do that but would love to discuss with the team an approach to do it, if possible
-  - My totals page is for a single subscription. If I had some more time, I would collate the data for ALL subscriptions by just hitting the page and it getting the data, instead of having to pass in a string to the function called in the controller
+  - My totals page is for hardcoded subscriptions. If I had some more time, I would collate the data for ALL subscriptions by just hitting the page and it getting the data, instead of having to pass in a string to the function called in the controller
     
 ## The Proof is in the Pudding (or in this case, screenshots)!
   - [Customer Created](https://i.imgur.com/kb8wuei.png)
