@@ -50,5 +50,5 @@ A few things to note as we look at this code:
   - [Customer Created](https://i.imgur.com/kb8wuei.png)
   - [Programatic creation of the Customer and Subscription](https://i.imgur.com/RN4AgiU.png)
   - [Proration Upgrade on the 5th month](https://i.imgur.com/KRPfqGg.png)
-  - [Output of Table data](https://i.imgur.com/2vxyFdD.png)
-  - [Output of Table data - rest of table](https://i.imgur.com/HKNz5nj.png)
+  - [Output of Table data](https://i.imgur.com/yi7dLAG.png)
+  - [Output of Table data - rest of table](https://i.imgur.com/A28dkuW.png)
