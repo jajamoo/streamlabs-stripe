@@ -73,7 +73,9 @@ class StripeController extends Controller
         
         return view('subscriptions.monthly_totals', [
             'customerInvoices' => $subscriptionData['customer_invoices'],
-            'nextMonths' => $subscriptionData['next_months']
+            'nextMonths' => $subscriptionData['next_months'],
+            'months' => $subscriptionData['next_months'],
+            'usdTotals' => $subscriptionData['usdTotals']
         ]);
     }
 

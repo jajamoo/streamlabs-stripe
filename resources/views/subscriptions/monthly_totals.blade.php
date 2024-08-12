@@ -46,6 +46,14 @@
             <td>${{ number_format($invoice['total'], 2) }}</td>
         </tr>
     @endforeach
+    <tr>
+        <td><strong>Totals</strong></td>
+        <td></td>
+        @foreach ($months as $month)
+            <td><strong>${{ number_format($usdTotals[$month] ?? 0, 2) }}</strong></td>
+        @endforeach
+        <td><strong>${{ number_format(array_sum($usdTotals), 2) }}</strong></td>
+    </tr>
     </tbody>
 </table>
 </body>

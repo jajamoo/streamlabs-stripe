@@ -187,13 +187,14 @@ class StripeService
         $subscriptions = [
             'sub_1PkwK7G7uyebomuyQQ7hTP2c',
             'sub_1Pkd6IG7uyebomuyIByFqLGK',
-            'sub_1Pkd68G7uyebomuyhksPelXM'
+            'sub_1Pkd68G7uyebomuyhksPelXM',
         ];
 
         $customerInvoices = [];
+        $usdTotals = [];
 
         foreach ($subscriptions as $subscriptionId) {
-            $subscription     = $this->getSubscriptionById($subscriptionId);
+            $subscription = $this->getSubscriptionById($subscriptionId);
 
             if (!$subscription) {
                 continue; // Skip if the subscription is not found
@@ -214,7 +215,7 @@ class StripeService
             for ($i = 1; $i <= 12; $i++) {
                 $months[] = Carbon::now()->addMonths($i)->startOfMonth()->format('Y-m');
             }
-            
+
             $chargeData  = [];
             $totalAmount = 0;
 
@@ -224,23 +225,35 @@ class StripeService
             }
 
             foreach ($invoices as $invoice) {
-                $invoiceMonth              = Carbon::createFromTimestamp($invoice->created)->format('Y-m');
-                $chargeData[$invoiceMonth] += $invoice->total / 100; // Convert amount to dollars
-                $totalAmount               += $invoice->total / 100; // Convert amount to dollars
+                $invoiceMonth = Carbon::createFromTimestamp($invoice->created)->format('Y-m');
+                if (in_array($invoiceMonth, $months)) {
+                    $charge                    = $invoice->total / 100; // Convert amount to dollars
+                    $chargeData[$invoiceMonth] += $charge;
+                    $totalAmount               += $charge;
+
+                    // Accumulate USD totals (only if the currency is USD)
+                    if (!isset($usdTotals[$invoiceMonth])) {
+                        $usdTotals[$invoiceMonth] = 0;
+                    }
+                    $usdTotals[$invoiceMonth] += $charge;
+
+                }
 
             }
 
             $customerInvoices[] = [
-                'email' => $customer->email,
+                'email'   => $customer->email,
                 'product' => $productName,
                 'charges' => $chargeData,
-                'total' => $totalAmount
+                'total'   => $totalAmount,
             ];
         }
-        
+
         return [
             'customer_invoices' => $customerInvoices,
-            'next_months' => $months
+            'next_months'       => $months,
+            'months' => array_keys($usdTotals), // Only include months with charges in the final row
+            'usdTotals' => $usdTotals
         ];
     }
 
