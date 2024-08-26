@@ -48,7 +48,7 @@
     @endforeach
     <tr>
         <td><strong>Totals</strong></td>
-        <td></td>
+        <td>N/A</td>
         @foreach ($months as $month)
             <td><strong>${{ number_format($usdTotals[$month] ?? 0, 2) }}</strong></td>
         @endforeach
