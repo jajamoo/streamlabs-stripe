@@ -51,8 +51,8 @@ RUN apt-get update \
     && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 # Download and install Stripe CLI
-RUN curl -L -o /tmp/stripe_1.21.2_linux_amd64.deb https://github.com/stripe/stripe-cli/releases/download/v1.21.2/stripe_1.21.2_linux_amd64.deb \
-    && dpkg -i /tmp/stripe_1.21.2_linux_amd64.deb
+#RUN curl -L -o /tmp/stripe_1.21.2_linux_amd64.deb https://github.com/stripe/stripe-cli/releases/download/v1.21.2/stripe_1.21.2_linux_amd64.deb \
+#    && dpkg -i /tmp/stripe_1.21.2_linux_amd64.deb
 
 RUN setcap "cap_net_bind_service=+ep" /usr/bin/php8.2
 
